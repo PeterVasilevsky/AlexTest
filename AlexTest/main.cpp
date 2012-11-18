@@ -222,14 +222,26 @@ void printChart(driver *aDriver)
     }
     
     //массив для графика
-    char chart[SCALE_DIMENSION][aDriver->averageDistanceVector.size()][2];
+	char ***chart;
+	int secondDim = aDriver->averageDistanceVector.size();
+	chart = new char**[SCALE_DIMENSION];
+	for (int i = 0; i < SCALE_DIMENSION; i++)
+		chart[i] = new char*[secondDim];
+	for (int i = 0; i < SCALE_DIMENSION; i++)
+		for (int j=0; j<secondDim; j++)
+			chart[i][j] = new char[2];
+    
+    
+	//const int a = aDriver->averageDistanceVector.size();
+	//char chart[SCALE_DIMENSION][aDriver->averageDistanceVector.size()][2];
     
     for (int i=(SCALE_DIMENSION-1); i>=0; i--) {
-        for (int j=0; j<aDriver->averageDistanceVector.size(); j++) {
-            if (aDriver->averageDistanceVector[j] >= distanceScale[i]) {
+        for (int j=0; j<(aDriver->averageDistanceVector.size()); j++) {
+			chart[i][j][1] = ' ';
+            if (aDriver->averageDistanceVector.at(j) >= distanceScale[i]) {
                 if (i == (SCALE_DIMENSION - 1)) {
                     chart[i][j][0] = 'x';
-                } else if (aDriver->averageDistanceVector[j] < distanceScale[i+1]) {
+				} else if (aDriver->averageDistanceVector.at(j) < distanceScale[i+1]) {
                     chart[i][j][0] = 'x';
                 } else {
                     chart[i][j][0] = ' ';
@@ -238,17 +250,20 @@ void printChart(driver *aDriver)
                 chart[i][j][0] = ' ';
             }
             
-            if (aDriver->averagePulseVector[j] >= pulseScale[i]) {
-                if (i == (SCALE_DIMENSION - 1)) {
-                    chart[i][j][1] = '*';
-                } else if (aDriver->averagePulseVector[j] < pulseScale[i+1]) {
-                    chart[i][j][1] = '*';
-                } else {
-                    chart[i][j][1] = ' ';
-                }
-            } else {
-                chart[i][j][1] = ' ';
-            }
+			if (j < aDriver->averagePulseVector.size())
+			{
+				if (aDriver->averagePulseVector.at(j) >= pulseScale[i]) {
+					if (i == (SCALE_DIMENSION - 1)) {
+						chart[i][j][1] = '*';
+					} else if (aDriver->averagePulseVector.at(j) < pulseScale[i+1]) {
+						chart[i][j][1] = '*';
+					} else {
+						chart[i][j][1] = ' ';
+					}
+				} else {
+					chart[i][j][1] = ' ';
+				}
+			}
         }
     }
     
@@ -269,6 +284,7 @@ void printChart(driver *aDriver)
         xScaleValue += TIME_STEP;
     }
     printf("\n");
+    
 }
 
 void writeToFile(driver* aDriver, char* filePath)
